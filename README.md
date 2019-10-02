@@ -22,7 +22,6 @@ Or install it yourself as:
         endpoint_url    "https://bcdb.modex.tech/node-03/services/core/v1/api" # Api endpoint like https://bcdb.modex.tech/node-03/services/core/v1/api
         auth_url        https://bcdb.modex.tech/oauth/token
         bcdb_entity     "logs" # BCD Entity Name
-        ### autodefined logline bcdb_property ### BCD Property  Name
         ssl_no_verify   false  # default: false
         rate_limit_msec 100    # default: 0 = no rate limiting
         raise_on_error  true  # default: true

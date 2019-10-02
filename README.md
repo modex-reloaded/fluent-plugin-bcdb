@@ -1,9 +1,3 @@
-# Fluent::Plugin::Bcdb
-
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/fluent/plugin/bcdb`. To experiment with that code, run `bin/console` for an interactive prompt.
-
-TODO: Delete this and the text above, and describe your gem
-
 ## Installation
 
 Add this line to your application's Gemfile:
@@ -23,28 +17,26 @@ Or install it yourself as:
 ## Usage
 
 ## Configuration options
-
-    <match *>
-      @type http
-      endpoint_url    http://localhost.local/api/
-      ssl_no_verify   false  # default: false
-      http_method     put    # default: post
-      serializer      json   # default: form
-      rate_limit_msec 100    # default: 0 = no rate limiting
-      raise_on_error  false  # default: true
-      recoverable_status_codes 503, 400 # default: 503
-      cacert_file     /etc/ssl/endpoint1.cert # default: ''
-      client_cert_path /path/to/client_cert.crt # default: ''
-      private_key_path /path/to/private_key.key # default: ''
-      private_key_passphrase yourpassphrase # default: ''
-      custom_headers  {"token":"arbitrary"} # default: nil
-      authentication  basic  # default: none
-      username        alice  # default: ''
-      password        bobpop # default: '', secret: true
-      token           tokent # default: ''
-      buffered        true   # default: false. Switch non-buffered/buffered mode
-      bulk_request    false  # default: false. Send events as application/x-ndjson
-      compress_request true  # default: false. Send compressed events
+    <match>
+        @type bcdb
+        endpoint_url    "https://bcdb.modex.tech/node-03/services/core/v1/api" # Api endpoint like https://bcdb.modex.tech/node-03/services/core/v1/api
+        auth_url        https://bcdb.modex.tech/oauth/token
+        bcdb_entity     "logs" # BCD Entity Name
+        ### autodefined logline bcdb_property ### BCD Property  Name
+        ssl_no_verify   false  # default: false
+        rate_limit_msec 100    # default: 0 = no rate limiting
+        raise_on_error  true  # default: true
+        recoverable_status_codes 503, 400 # default: 503
+        cacert_file     /etc/ssl/endpoint1.cert # default: ''
+        client_cert_path /path/to/client_cert.crt # default: ''
+        private_key_path /path/to/private_key.key # default: ''
+        private_key_passphrase yourpassphrase # default: ''
+        username        bcdb.admin@modex.tech  # default: ''
+        password        BCDBDemo2019! # default: '', secret: true
+        client_id       0x01 # BDCB client_id
+        client_secret   0x000001 # BDCB client_secret
+        buffered        false   # default: false. Switch non-buffered/buffered mode
+        compress_request false  # default: false. Send compressed events
     </match>
 
 ## Usage notes

@@ -40,12 +40,7 @@ Or install it yourself as:
 
 ## Usage notes
 
-If you'd like to retry failed requests, consider using [fluent-plugin-bufferize][3].
-Or, specify appropriate `recoverable_status_codes` parameter.
-
-To send events with bulk_request, you should specify `bulk_request` as `true`
-Note that when this parameter as `true`, Fluentd always send events as `application/x-ndjson`.
-Currently, `application/x-ndjson` is only supported MIME type for bulk_request.
+If you'd like to retry failed requests, specify appropriate `recoverable_status_codes` parameter.
 
 
 ## Development

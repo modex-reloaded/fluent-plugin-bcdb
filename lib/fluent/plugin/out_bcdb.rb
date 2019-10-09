@@ -36,7 +36,7 @@ class BcdbOut < Fluent::Plugin::Output
   end
 
   # BCDB data endpoint
-  config_param :endpoint_url, :string
+  config_param :base_url, :string
 
   # BCDB Auth endpoint
   config_param :auth_url, :string
@@ -104,8 +104,12 @@ class BcdbOut < Fluent::Plugin::Output
   def configure(conf)
     compat_parameters_convert(conf, :buffer, :formatter)
     super
-    @create_schema_url = "#{@endpoint_url}" + "/catalog/_JsonSchema/" + "#{@bcdb_entity}"
-    @endpoint_url = "#{@endpoint_url}" + "/data/" + "#{@bcdb_entity}"
+    @create_schema_url = "#{@base_url}" + "/catalog/_JsonSchema/" + "#{@bcdb_entity}"
+    if (@bulk_request || @buffered)
+        @base_url = "#{@base_url}" + "/data/bulk/" + "#{@bcdb_entity}"
+    else
+        @base_url = "#{@base_url}" + "/data/" + "#{@bcdb_entity}"
+    end
 
     @ssl_verify_mode = if @ssl_no_verify
                          OpenSSL::SSL::VERIFY_NONE
@@ -143,6 +147,7 @@ class BcdbOut < Fluent::Plugin::Output
           :client_secret => @client_secret,
           :grant_type => @grant_type
       }
+      status = true
       unless @token_oauth || (@expires_token && Time.now.utc > @expires_token)
           https= Net::HTTP.new(auth_uri.host,auth_uri.port)
           https.use_ssl = true
@@ -151,12 +156,47 @@ class BcdbOut < Fluent::Plugin::Output
           request['Content-Type'] = "application/x-www-form-urlencoded"
           resp = https.request(request)
           bcdb_response = JSON.parse(resp.body)
-          @token_oauth = bcdb_response['access_token']
-          @expires_token = Time.now.utc + bcdb_response['expires_in'].to_i
+          if bcdb_response["code"] == 5000
+              status = false
+              log.error("Authentification failed please check your credentials")
+          else
+              @token_oauth = bcdb_response['access_token']
+              @expires_token = Time.now.utc + bcdb_response['expires_in'].to_i
+          end
       end
-      return true
+      return status
   end
 
+  def bcdb_update_schema(data, cached_keys=false)
+      schema_uri = URI.parse(@create_schema_url)
+      schema_properties = {}
+      data.keys.each do |key|
+          schema_properties["#{key}"] = {
+              :"$id" => "/properties/#{schema_properties["#{key}"]}",
+              :type => "string",
+              :title => "The #{schema_properties["#{key}"]} Schema"
+          }
+      end
+      schema_data = {
+          :type => "object",
+          :"$id" => @bcdb_entity,
+          :"$schema" => "http://json-schema.org/draft-07/schema#",
+          :title => "The Root Schema",
+          :properties => schema_properties,
+          :autoId => true
+      }
+      body = JSON(schema_data)
+
+      if cached_keys
+          request = bcdb_url(schema_uri,'put', body)
+      else
+          request = bcdb_url(schema_uri,'post',body)
+          if JSON.parse(request.body)["code"] == 5000
+              request = bcdb_url(schema_uri,'put', body)
+          end
+      end
+     return data.keys, true
+  end
   def bcdb_url(uri,type,body)
       bcdb_request = Net::HTTP.new(uri.host,uri.port)
       bcdb_request.use_ssl = uri.scheme == 'https'
@@ -182,7 +222,7 @@ class BcdbOut < Fluent::Plugin::Output
   end
 
   def format_url(tag, time, record)
-    @endpoint_url
+    @base_url
   end
 
   def set_body(req, tag, time, record)
@@ -223,32 +263,9 @@ class BcdbOut < Fluent::Plugin::Output
   def set_json_body(req, data)
     req.body = Yajl.dump(data)
     if bcdb_authorise()
-        unless @cahed_keys && @cahed_keys.sort == data.keys.sort
-            schema_uri = URI.parse(@create_schema_url)
-            schema_properties = {}
-            data.keys.each do |key|
-                schema_properties["#{key}"] = "string"
-            end
-            schema_data = {
-                :type => "object",
-                :type => [],
-                :properties => schema_properties,
-                :autoId => true
-            }
-            body = JSON(schema_data)
-
-            if @cahed_keys
-                request = bcdb_url(schema_uri,'put', body)
-            else
-                request = bcdb_url(schema_uri,'post',body)
-                if JSON.parse(request.body)["code"] == 5000
-                    request = bcdb_url(schema_uri,'put', body)
-                end
-            end
-            @cahed_keys = data.keys
+        unless @cached_keys && @keys.sort == data.keys.sort
+            @keys, @cached_keys = bcdb_update_schema(data, @cached_keys)
         end
-    else
-        log.error("Authentification failed please check your credentials")
     end
     req['Content-Type'] = "application/json"
     compress_body(req, req.body)
@@ -267,8 +284,19 @@ class BcdbOut < Fluent::Plugin::Output
   end
 
   def set_bulk_body(req, data)
-    req.body = data.to_s
-    req['Content-Type'] = 'application/x-ndjson'
+    bcdb_authorise()
+    if data.is_a? String
+        bcdb_data = data.split("\n").map{ |x| JSON.parse(x) }
+        bcdb_data.each do |data|
+            unless @cached_keys && @keys.sort == data.keys.sort
+                @keys, @cached_keys = bcdb_update_schema(data, @cached_keys)
+            end
+        end
+        data = { :records => bcdb_data }
+    end
+    req.body = Yajl.dump(data)
+    # req['Content-Type'] = 'application/x-ndjson'
+    req['Content-Type'] = 'application/json'
     compress_body(req, req.body)
   end
 
@@ -326,7 +354,6 @@ class BcdbOut < Fluent::Plugin::Output
       else
         res = Net::HTTP.start(uri.host, uri.port, **http_opts(uri)) {|http| http.request(req) }
       end
-
     rescue => e # rescue all StandardErrors
       # server didn't respond
       log.warn "Net::HTTP.#{req.method.capitalize} raises exception: #{e.class}, '#{e.message}'"
@@ -396,7 +423,7 @@ class BcdbOut < Fluent::Plugin::Output
 
   def write(chunk)
     tag = chunk.metadata.tag
-    @endpoint_url = extract_placeholders(@endpoint_url, chunk)
+    @base_url = extract_placeholders(@base_url, chunk)
     if @bulk_request
       time = Fluent::Engine.now
       handle_records(tag, time, chunk)

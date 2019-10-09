@@ -19,22 +19,22 @@ Or install it yourself as:
 ## Configuration options
     <match>
         @type bcdb
-        endpoint_url    "https://bcdb.modex.tech/node-03/services/core/v1/api" # Api endpoint like https://bcdb.modex.tech/node-03/services/core/v1/api
+        base_url    "https://bcdb.modex.tech/node-03/services/core/v1/api" # Api endpoint like https://bcdb.modex.tech/node-03/services/core/v1/api
         auth_url        https://bcdb.modex.tech/oauth/token
-        bcdb_entity     "logs" # BCD Entity Name
         ssl_no_verify   false  # default: false
         rate_limit_msec 100    # default: 0 = no rate limiting
         raise_on_error  true  # default: true
-        recoverable_status_codes 503, 400 # default: 503
+        recoverable_status_codes 403, 400, 503, 500 # default: 503
         cacert_file     /etc/ssl/endpoint1.cert # default: ''
         client_cert_path /path/to/client_cert.crt # default: ''
         private_key_path /path/to/private_key.key # default: ''
         private_key_passphrase yourpassphrase # default: ''
         username        bcdb.admin@modex.tech  # default: ''
-        password        BCDBDemo2019! # default: '', secret: true
+        password        BCDBDemo2019!! # default: '', secret: true
         client_id       0x01 # BDCB client_id
         client_secret   0x000001 # BDCB client_secret
         buffered        false   # default: false. Switch non-buffered/buffered mode
+        bulk_request    false   # default: false. Send events as application/x-ndjson 
         compress_request false  # default: false. Send compressed events
     </match>
 
@@ -42,6 +42,7 @@ Or install it yourself as:
 
 If you'd like to retry failed requests, specify appropriate `recoverable_status_codes` parameter.
 
+To send events with bulk_request, you should specify bulk_request as true Note that when this parameter as true, Fluentd always send events as application/x-ndjson. Currently, application/x-ndjson is only supported MIME type for bulk_request.
 
 ## Development
 

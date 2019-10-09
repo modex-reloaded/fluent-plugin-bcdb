@@ -262,10 +262,9 @@ class BcdbOut < Fluent::Plugin::Output
 
   def set_json_body(req, data)
     req.body = Yajl.dump(data)
-    if bcdb_authorise()
-        unless @cached_keys && @keys.sort == data.keys.sort
-            @keys, @cached_keys = bcdb_update_schema(data, @cached_keys)
-        end
+    bcdb_authorise()
+    unless @cached_keys && @keys.sort == data.keys.sort
+        @keys, @cached_keys = bcdb_update_schema(data, @cached_keys)
     end
     req['Content-Type'] = "application/json"
     compress_body(req, req.body)

@@ -105,11 +105,13 @@ class BcdbOut < Fluent::Plugin::Output
     compat_parameters_convert(conf, :buffer, :formatter)
     super
     @create_schema_url = "#{@base_url}" + "/catalog/_JsonSchema/" + "#{@bcdb_entity}"
-    if (@bulk_request || @buffered)
+    if ((@bulk_request && @buffered) || @buffered)
         @base_url = "#{@base_url}" + "/data/bulk/" + "#{@bcdb_entity}"
     else
         @base_url = "#{@base_url}" + "/data/" + "#{@bcdb_entity}"
     end
+
+    bcdb_authorise() if @authentication == :oauth
 
     @ssl_verify_mode = if @ssl_no_verify
                          OpenSSL::SSL::VERIFY_NONE
@@ -170,7 +172,7 @@ class BcdbOut < Fluent::Plugin::Output
   def bcdb_update_schema(data, cached_keys=false)
       schema_uri = URI.parse(@create_schema_url)
       schema_properties = {}
-      data.keys.each do |key|
+      data.each do |key|
           schema_properties["#{key}"] = {
               :"$id" => "/properties/#{schema_properties["#{key}"]}",
               :type => "string",
@@ -195,7 +197,7 @@ class BcdbOut < Fluent::Plugin::Output
               request = bcdb_url(schema_uri,'put', body)
           end
       end
-     return data.keys, true
+     return data, true
   end
   def bcdb_url(uri,type,body)
       bcdb_request = Net::HTTP.new(uri.host,uri.port)
@@ -208,7 +210,7 @@ class BcdbOut < Fluent::Plugin::Output
       end
       request.body = body
       request['Content-Type'] = "application/json"
-      request['authorization'] = "bearer #{@token_oauth}"
+      request['authorization'] = "Bearer #{@token_oauth}"
       response = bcdb_request.request(request)
       return response
   end
@@ -285,11 +287,14 @@ class BcdbOut < Fluent::Plugin::Output
   def set_bulk_body(req, data)
     bcdb_authorise()
     if data.is_a? String
+        flat_keys = []
         bcdb_data = data.split("\n").map{ |x| JSON.parse(x) }
         bcdb_data.each do |data|
-            unless @cached_keys && @keys.sort == data.keys.sort
-                @keys, @cached_keys = bcdb_update_schema(data, @cached_keys)
-            end
+            flat_keys = flat_keys + data.keys
+        end
+        flat_keys.uniq!
+        unless @cached_keys && @keys.sort == flat_keys.sort
+            @keys, @cached_keys = bcdb_update_schema(flat_keys, @cached_keys)
         end
         data = { :records => bcdb_data }
     end
@@ -340,7 +345,7 @@ class BcdbOut < Fluent::Plugin::Output
       elsif @authentication == :jwt
         req['authorization'] = "jwt #{@token}"
       elsif @authentication == :oauth
-          req['authorization'] = "bearer #{@token_oauth}"
+          req['authorization'] = "Bearer #{@token_oauth}"
       end
       @last_request_time = Time.now.to_f
 

@@ -12,7 +12,7 @@ Gem::Specification.new do |spec|
   spec.homepage      = "https://github.com/messbusters/fluent-plugin-bcdb"
   spec.license       = "APACHE"
 
-  spec.metadata["allowed_push_host"] = "https://modex.tech"
+  spec.metadata["allowed_push_host"] = ""
 
   spec.metadata["homepage_uri"] = spec.homepage
   spec.metadata["source_code_uri"] = "https://github.com/messbusters/fluent-plugin-bcdb"

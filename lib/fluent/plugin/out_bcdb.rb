@@ -152,7 +152,8 @@ class BcdbOut < Fluent::Plugin::Output
       status = true
       unless @token_oauth || (@expires_token && Time.now.utc > @expires_token)
           https= Net::HTTP.new(auth_uri.host,auth_uri.port)
-          https.use_ssl = true
+          https.use_ssl = https.scheme == 'https'
+
           request = Net::HTTP::Post.new(auth_uri.path)
           request.set_form_data(auth_data)
           request['Content-Type'] = "application/x-www-form-urlencoded"

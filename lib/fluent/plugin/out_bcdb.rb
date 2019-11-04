@@ -152,12 +152,13 @@ class BcdbOut < Fluent::Plugin::Output
       status = true
       unless @token_oauth || (@expires_token && Time.now.utc > @expires_token)
           https= Net::HTTP.new(auth_uri.host,auth_uri.port)
-          https.use_ssl = https.scheme == 'https'
+          https.use_ssl = auth_uri.scheme == 'https'
 
           request = Net::HTTP::Post.new(auth_uri.path)
           request.set_form_data(auth_data)
           request['Content-Type'] = "application/x-www-form-urlencoded"
           resp = https.request(request)
+          log.debug("#{resp.body}")
           bcdb_response = JSON.parse(resp.body)
           if bcdb_response["code"] == 5000
               status = false
@@ -303,6 +304,7 @@ class BcdbOut < Fluent::Plugin::Output
         unless @cached_keys && @keys.sort == data.keys.sort
             @keys, @cached_keys = bcdb_update_schema(data, @cached_keys)
         end
+        data = { :records => [data] }
     end
     req.body = Yajl.dump(data)
     # req['Content-Type'] = 'application/x-ndjson'

@@ -365,6 +365,8 @@ class BcdbOut < Fluent::Plugin::Output
                               **http_opts(uri)) {|http| http.request(req) }
       else
         res = Net::HTTP.start(uri.host, uri.port, **http_opts(uri)) {|http| http.request(req) }
+        log.debug("REQUEST BODY: #{req.body}")
+        log.debug("RESPONSE BODY: #{res.body}")
       end
     rescue => e # rescue all StandardErrors
       # server didn't respond

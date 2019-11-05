@@ -175,6 +175,7 @@ class BcdbOut < Fluent::Plugin::Output
       schema_uri = URI.parse(@create_schema_url)
       schema_properties = {}
       data.each do |key|
+          log.debug("KEY #{key.inspect}")
           schema_properties["#{key}"] = {
               :"$id" => "/properties/#{schema_properties["#{key}"]}",
               :type => "string",
@@ -195,10 +196,13 @@ class BcdbOut < Fluent::Plugin::Output
           request = bcdb_url(schema_uri,'put', body)
       else
           request = bcdb_url(schema_uri,'post',body)
-          if JSON.parse(request.body)["code"] == 5000
+          if JSON.parse(request.body)["code"] == 4009
               request = bcdb_url(schema_uri,'put', body)
           end
       end
+     log.debug("UPDATE SCHEMA: #{body}")
+
+     log.debug("UPDATE SCHEMA RESPONSE: #{request.body}")
      return data, true
   end
   def bcdb_url(uri,type,body)
@@ -267,7 +271,7 @@ class BcdbOut < Fluent::Plugin::Output
   def set_json_body(req, data)
     bcdb_authorise()
     unless @cached_keys && @keys.sort == data.keys.sort
-        @keys, @cached_keys = bcdb_update_schema(data, @cached_keys)
+        @keys, @cached_keys = bcdb_update_schema(data.keys, @cached_keys)
     end
     data = { :records => [data] } if @buffered
     req.body = Yajl.dump(data)
@@ -301,8 +305,9 @@ class BcdbOut < Fluent::Plugin::Output
         end
         data = { :records => bcdb_data }
     else
+        log.debug("DATA: #{data.inspect}")
         unless @cached_keys && @keys.sort == data.keys.sort
-            @keys, @cached_keys = bcdb_update_schema(data, @cached_keys)
+            @keys, @cached_keys = bcdb_update_schema(data.keys, @cached_keys)
         end
         data = { :records => [data] }
     end

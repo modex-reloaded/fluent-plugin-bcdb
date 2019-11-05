@@ -19,7 +19,7 @@ Or install it yourself as:
 ## Configuration options
     <match>
         @type bcdb
-        base_url    "https://bcdb.modex.tech/node-03/services/core/v1/api" # Api endpoint like https://bcdb.modex.tech/node-03/services/core/v1/api
+        base_url        https://bcdb.modex.tech/node-03/services/core/v1/api
         auth_url        https://bcdb.modex.tech/oauth/token
         ssl_no_verify   false  # default: false
         rate_limit_msec 100    # default: 0 = no rate limiting
@@ -34,7 +34,7 @@ Or install it yourself as:
         client_id       0x01 # BDCB client_id
         client_secret   0x000001 # BDCB client_secret
         buffered        false   # default: false. Switch non-buffered/buffered mode
-        bulk_request    false   # default: false. Send events as application/x-ndjson 
+        bulk_request    false   # default: false. Send events as application/x-ndjson
         compress_request false  # default: false. Send compressed events
     </match>
 

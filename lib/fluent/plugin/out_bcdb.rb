@@ -105,8 +105,7 @@ class BcdbOut < Fluent::Plugin::Output
     compat_parameters_convert(conf, :buffer, :formatter)
     super
     @create_schema_url = "#{@base_url}" + "/catalog/_JsonSchema/" + "#{@bcdb_entity}"
-    @base_url_ = @base_url
-    if ((@bulk_request && @buffered) || @buffered)
+    if @bulk_request
         @base_url = "#{@base_url}" + "/data/bulk/" + "#{@bcdb_entity}"
     else
         @base_url = "#{@base_url}" + "/data/" + "#{@bcdb_entity}"
@@ -274,7 +273,7 @@ class BcdbOut < Fluent::Plugin::Output
     unless @cached_keys && @keys.sort == data.keys.sort
         @keys, @cached_keys = bcdb_update_schema(data.keys, @cached_keys)
     end
-    data = { :records => [data] } if @buffered
+    # data = { :records => [data] } if @bulk_request
     req.body = Yajl.dump(data)
     req['Content-Type'] = "application/json"
     compress_body(req, req.body)
@@ -311,7 +310,7 @@ class BcdbOut < Fluent::Plugin::Output
         unless @cached_keys && @keys.sort == data.keys.sort
             @keys, @cached_keys = bcdb_update_schema(data.keys, @cached_keys)
         end
-        @base_url = "#{@base_url_}" + "/data/" + "#{@bcdb_entity}"
+        data = { :records => [data] }
     end
     req.body = Yajl.dump(data)
     # req['Content-Type'] = 'application/x-ndjson'
@@ -372,6 +371,7 @@ class BcdbOut < Fluent::Plugin::Output
                               **http_opts(uri)) {|http| http.request(req) }
       else
         res = Net::HTTP.start(uri.host, uri.port, **http_opts(uri)) {|http| http.request(req) }
+        log.debug("REQUEST URI: #{uri}")
         log.debug("REQUEST BODY: #{req.body}")
         log.debug("RESPONSE BODY: #{res.body}")
       end

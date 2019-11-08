@@ -14,6 +14,10 @@ Or install it yourself as:
 
     $ gem install fluent-plugin-bcdb
 
+---
+> **NOTE:** See [here](https://bcdb.modex.tech/docs/#/install/install) the installation guide for Modex BCDB
+---
+
 ## Usage
 
 ## Configuration options
@@ -37,6 +41,7 @@ Or install it yourself as:
         bulk_request    false   # default: false. Send events as application/x-ndjson
         compress_request false  # default: false. Send compressed events
     </match>
+
 
 ## Usage notes
 

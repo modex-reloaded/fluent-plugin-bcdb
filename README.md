@@ -1,6 +1,6 @@
-# Fluentd-BCDB-connector notes
+# Fluentd Modex BCDB connector
 
-Fluentd-bcdb-connector enables immutable logs using [Modex BCDB](https://bcdb.modex.tech). Main features: 
+fluentd-bcdb-connector enables immutable logs using [Modex BCDB](https://bcdb.modex.tech). Main features: 
 
 * Bulk insert of records
 * Buffered insert of records
@@ -28,6 +28,9 @@ Or install it yourself as:
 ## Usage
 
 ## Configuration options
+
+> **NOTE:** this is a configuration example using Modex BCDB [sandbox](https://bcdb.modex.tech)
+
     <match>
         @type bcdb
         base_url        https://bcdb.modex.tech/node-03/services/core/v1/api
@@ -40,8 +43,8 @@ Or install it yourself as:
         client_cert_path /path/to/client_cert.crt # default: ''
         private_key_path /path/to/private_key.key # default: ''
         private_key_passphrase yourpassphrase # default: ''
-        username        bcdb.admin@modex.tech  # default: ''
-        password        BCDBDemo2019!! # default: '', secret: true
+        username        bcdb.admin@modex.tech # default: ''
+        password        BCDBDemo2019! # default: '', secret: true
         client_id       0x01 # BDCB client_id
         client_secret   0x000001 # BDCB client_secret
         buffered        false   # default: false. Switch non-buffered/buffered mode

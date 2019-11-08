@@ -67,7 +67,7 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 ## Contributing
 
-Bug reports and pull requests are welcomed on GitHub at https://github.com/modex-bcdb/fluent-plugin-bcdb. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
+[Bug reports](https://github.com/modex-bcdb/fluentd-bcdb-connector/issues) and [pull requests](https://github.com/modex-bcdb/fluentd-bcdb-connector/pulls) are welcomed on GitHub. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
 
 ## License
 

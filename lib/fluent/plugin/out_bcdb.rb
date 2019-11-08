@@ -324,6 +324,7 @@ class BcdbOut < Fluent::Plugin::Output
     req = Net::HTTP.const_get(@http_method.to_s.capitalize).new(uri.request_uri)
     set_body(req, tag, time, record)
     set_header(req, tag, time, record)
+    log.trace("CREATE REQUEST: #{req}, #{uri}")
     return req, uri
   end
 
@@ -371,7 +372,6 @@ class BcdbOut < Fluent::Plugin::Output
                               **http_opts(uri)) {|http| http.request(req) }
       else
         res = Net::HTTP.start(uri.host, uri.port, **http_opts(uri)) {|http| http.request(req) }
-        log.debug("REQUEST URI: #{uri}")
         log.debug("REQUEST BODY: #{req.body}")
         log.debug("RESPONSE BODY: #{res.body}")
       end
@@ -437,6 +437,7 @@ class BcdbOut < Fluent::Plugin::Output
   end
 
   def process(tag, es)
+    log.trace("TRACE PROCESS: #{tag}, #{es}")
     es.each do |time, record|
       handle_record(tag, time, record)
     end

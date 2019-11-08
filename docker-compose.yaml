@@ -20,4 +20,4 @@ services:
       - "24224:24224"
       - "24224:24224/udp"
     tty: true
-    command: ["/usr/bin/ruby", "-Eascii-8bit:ascii-8bit", "/usr/bin/fluentd", "-c","/fluentd/etc/fluent.conf","-v"]
+    command: ["/usr/bin/ruby", "-Eascii-8bit:ascii-8bit", "/usr/bin/fluentd", "-c","/fluentd/etc/fluent.conf"]

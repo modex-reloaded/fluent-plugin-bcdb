@@ -1,4 +1,17 @@
+# Fluentd-BCDB-connector notes
+
+Fluentd-bcdb-connector enables immutable logs using [Modex BCDB](https://bcdb.modex.tech). Main features are: 
+
+* Bulk insert of records
+* Buffered insert of records
+* Request compression
+
 ## Installation
+
+---
+> **NOTE:** See [here](https://bcdb.modex.tech/docs/#/install/install) the installation guide for Modex BCDB
+---
+
 
 Add this line to your application's Gemfile:
 
@@ -13,10 +26,6 @@ And then execute:
 Or install it yourself as:
 
     $ gem install fluent-plugin-bcdb
-
----
-> **NOTE:** See [here](https://bcdb.modex.tech/docs/#/install/install) the installation guide for Modex BCDB
----
 
 ## Usage
 

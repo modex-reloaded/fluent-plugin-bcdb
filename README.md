@@ -1,6 +1,6 @@
 # Fluentd-BCDB-connector notes
 
-Fluentd-bcdb-connector enables immutable logs using [Modex BCDB](https://bcdb.modex.tech). Main features are: 
+Fluentd-bcdb-connector enables immutable logs using [Modex BCDB](https://bcdb.modex.tech). Main features: 
 
 * Bulk insert of records
 * Buffered insert of records
@@ -8,10 +8,8 @@ Fluentd-bcdb-connector enables immutable logs using [Modex BCDB](https://bcdb.mo
 
 ## Installation
 
+> **NOTE:** First see [here](https://bcdb.modex.tech/docs/#/install/install) the installation guide for Modex BCDB
 ---
-> **NOTE:** See [here](https://bcdb.modex.tech/docs/#/install/install) the installation guide for Modex BCDB
----
-
 
 Add this line to your application's Gemfile:
 
@@ -54,19 +52,19 @@ Or install it yourself as:
 
 ## Usage notes
 
-If you'd like to retry failed requests, specify appropriate `recoverable_status_codes` parameter.
+If you want to retry failed requests, specify the appropriate `recoverable_status_codes` parameter.
 
-To send events with bulk_request, you should specify bulk_request as true Note that when this parameter as true, Fluentd always send events as application/x-ndjson. Currently, application/x-ndjson is only supported MIME type for bulk_request.
+To send events with bulk_request, you need to specify bulk_request as true. Note that when this parameter is true, Fluentd will always send events as application/x-ndjson. Currently, application/x-ndjson is the only supported MIME type for bulk_request.
 
 ## Development
 
-After checking out the repo, run `bin/setup` to install dependencies. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
+After you checkout the repo, run `bin/setup` to install dependencies. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
 
 To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/modex-bcdb/fluent-plugin-bcdb. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
+Bug reports and pull requests are welcomed on GitHub at https://github.com/modex-bcdb/fluent-plugin-bcdb. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
 
 ## License
 

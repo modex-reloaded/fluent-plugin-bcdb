@@ -1,5 +1,5 @@
 #
-# Copyright ©2019. Modex. | MODEX (Gibraltar) LIMITED
+# Copyright ©2019. MODEX (Gibraltar) LIMITED
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.

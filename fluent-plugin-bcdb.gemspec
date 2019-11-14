@@ -20,8 +20,8 @@ require "fluent/plugin/bcdb/version"
 Gem::Specification.new do |spec|
   spec.name          = "fluent-plugin-bcdb"
   spec.version       = Fluent::Plugin::Bcdb::VERSION
-  spec.authors       = ["Silviu Panaite"]
-  spec.email         = ["silviu@messbusters.org"]
+  spec.authors       = ["Modex Team"]
+  spec.email         = ["support@modex.tech"]
 
   spec.summary       = %q{Fluent output plugin to Modex Blockchain Database}
   spec.homepage      = "https://github.com/messbusters/fluent-plugin-bcdb"

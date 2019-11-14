@@ -1,4 +1,4 @@
-# Fluentd Modex BCDB connector
+# Fluentd Modex BCDB connector 
 
 fluentd-bcdb-connector enables immutable logs using [Modex BCDB](https://bcdb.modex.tech). Main features: 
 

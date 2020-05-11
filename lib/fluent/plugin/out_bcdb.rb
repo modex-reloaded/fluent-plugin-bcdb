@@ -104,9 +104,9 @@ class BcdbOut < Fluent::Plugin::Output
   def configure(conf)
     compat_parameters_convert(conf, :buffer, :formatter)
     super
-    @create_schema_url = "#{@base_url}" + "/catalog/_JsonSchema/" + "#{@bcdb_entity}"
+    @create_schema_url = "#{@base_url}" + "/data/catalog/_JsonSchema/" + "#{@bcdb_entity}"
     if @bulk_request
-        @base_url = "#{@base_url}" + "/data/bulk/" + "#{@bcdb_entity}"
+        @base_url =  "#{@base_url}" + "/data/bulkAsync/" + "#{@bcdb_entity}"
     else
         @base_url = "#{@base_url}" + "/data/" + "#{@bcdb_entity}"
     end
@@ -196,7 +196,8 @@ class BcdbOut < Fluent::Plugin::Output
           request = bcdb_url(schema_uri,'put', body)
       else
           request = bcdb_url(schema_uri,'post',body)
-          if JSON.parse(request.body)["code"] == 4009
+          res = JSON.parse(request.body)["code"]
+          if res == 4009 || res == 4000
               request = bcdb_url(schema_uri,'put', body)
           end
       end
@@ -304,7 +305,7 @@ class BcdbOut < Fluent::Plugin::Output
             @keys, @cached_keys = bcdb_update_schema(flat_keys, @cached_keys)
         end
         data = { :records => bcdb_data }
-        @base_url = "#{@base_url_}" + "/data/bulk/" + "#{@bcdb_entity}"
+        @base_url = "#{@base_url_}" + "/data/bulkAsync/" + "#{@bcdb_entity}"
     else
         log.debug("DATA: #{data.inspect}")
         unless @cached_keys && @keys.sort == data.keys.sort

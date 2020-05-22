@@ -24,12 +24,12 @@ Gem::Specification.new do |spec|
   spec.email         = ["support@modex.tech"]
 
   spec.summary       = %q{Fluent output plugin to Modex Blockchain Database}
-  spec.homepage      = "https://github.com/messbusters/fluent-plugin-bcdb"
+  spec.homepage      = "https://github.com/modex-bcdb/fluent-plugin-bcdb"
   spec.license       = "APACHE"
 
   spec.metadata["homepage_uri"] = spec.homepage
-  spec.metadata["source_code_uri"] = "https://github.com/messbusters/fluent-plugin-bcdb"
-  spec.metadata["changelog_uri"] = "https://github.com/messbusters/fluent-plugin-bcdb"
+  spec.metadata["source_code_uri"] = "https://github.com/modex-bcdb/fluent-plugin-bcdb"
+  spec.metadata["changelog_uri"] = "https://github.com/modex-bcdb/fluent-plugin-bcdb"
 
   # Specify which files should be added to the gem when it is released.
   # The `git ls-files -z` loads the files in the RubyGem that have been added into git.

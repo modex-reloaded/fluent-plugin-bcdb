@@ -151,23 +151,31 @@ class BcdbOut < Fluent::Plugin::Output
           :grant_type => @grant_type
       }
       status = true
-      unless @token_oauth || (@expires_token && Time.now.utc > @expires_token)
-          https= Net::HTTP.new(auth_uri.host,auth_uri.port)
-          https.use_ssl = auth_uri.scheme == 'https'
+      begin
+          unless (@token_oauth && (@expires_token && Time.now.utc < @expires_token))
+              https= Net::HTTP.new(auth_uri.host,auth_uri.port)
+              https.use_ssl = auth_uri.scheme == 'https'
 
-          request = Net::HTTP::Post.new(auth_uri.path)
-          request.set_form_data(auth_data)
-          request['Content-Type'] = "application/x-www-form-urlencoded"
-          resp = https.request(request)
-          log.debug("#{resp.body}")
-          bcdb_response = JSON.parse(resp.body)
-          if bcdb_response["code"] == 5000
-              status = false
-              log.error("Authentification failed please check your credentials")
-          else
-              @token_oauth = bcdb_response['access_token']
-              @expires_token = Time.now.utc + bcdb_response['expires_in'].to_i
+              request = Net::HTTP::Post.new(auth_uri.path)
+              request.set_form_data(auth_data)
+              request['Content-Type'] = "application/x-www-form-urlencoded"
+              resp = https.request(request)
+              bcdb_response = {}
+              bcdb_response = JSON.parse(resp.body) rescue bcdb_response["code"] = 5000.to_s
+              if resp.code == 200.to_s && bcdb_response['access_token']
+                  @token_oauth = bcdb_response['access_token']
+                  @headers["Authorization"] = "Bearer #{@token_oauth}"
+                  @expires_token = Time.now.utc + bcdb_response['expires_in'].to_i
+              else
+                  status = false
+                  @logger.error("Authentification failed please check your credentials")
+              end
           end
+      rescue => e
+        # This should never happen unless there's a flat out issue with the network 
+        log.error("Error Makeing Authorization Request to BCDB. Error: #{e.message} | Backtrace: #{e.backtrace}")
+        sleep(2)
+        bcdb_authorise()
       end
       return status
   end

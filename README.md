@@ -1,11 +1,5 @@
 # Fluentd Modex BCDB connector
 
-fluentd-bcdb-connector enables immutable logs using [Modex BCDB](https://bcdb.modex.tech). Main features:
-
-* Bulk insert of records
-* Buffered insert of records
-* Request compression
-
 ## Installation
 
 > **NOTE:** First see [here](https://bcdb.modex.tech/docs/#/install/install) the installation guide for Modex BCDB
@@ -58,6 +52,8 @@ Or install it yourself as:
 If you want to retry failed requests, specify the appropriate `recoverable_status_codes` parameter.
 
 To send events with bulk_request, you need to specify bulk_request as true. Note that when this parameter is true, Fluentd will always send events as application/x-ndjson. Currently, application/x-ndjson is the only supported MIME type for bulk_request.
+
+> **Note** Examples of configuration and additional test files can be used from **./dev** folder. Also read the additional readme.md file locatated in the folder.
 
 ## Development
 
